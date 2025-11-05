@@ -1,0 +1,2337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Psychometrician Board Exam Study Tracker</title>
+    <style>
+        /* CSS Variables for consistent theming */
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2c3e50;
+            --success-color: #2ecc71;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --border-radius: 4px;
+            --box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f7fa;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: 250px;
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 1rem;
+            overflow-y: auto;
+            transition: var(--transition);
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.2rem;
+        }
+
+        .sidebar-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .nav-list {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 0.75rem;
+            color: white;
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .subject-list {
+            margin-top: 1rem;
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+        }
+
+        .subject-item {
+            padding: 0.5rem;
+            margin-bottom: 0.5rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .subject-item:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .subject-item.active {
+            background-color: var(--primary-color);
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background-color: white;
+            padding: 1rem;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .content-area {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .materials-panel {
+            width: 300px;
+            background-color: white;
+            border-right: 1px solid #e0e0e0;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        .subtopics-panel {
+            flex: 1;
+            background-color: white;
+            padding: 1rem;
+            overflow-y: auto;
+        }
+
+        /* Panel Headers */
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .panel-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-sm {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        /* Progress Bar Styles */
+        .progress-container {
+            margin: 0.5rem 0;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--success-color);
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 0.25rem;
+        }
+
+        /* Card Styles */
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            cursor: move;
+            transition: var(--transition);
+        }
+
+        .card.dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            background-color: white;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-not_started {
+            background-color: #e0e0e0;
+            color: #666;
+        }
+
+        .status-in_progress {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .status-completed {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        /* Flag Icon */
+        .flag-icon {
+            color: #e0e0e0;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .flag-icon.flagged {
+            color: var(--danger-color);
+        }
+
+        /* Today Plan Styles */
+        .today-plan-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .today-plan-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Pomodoro Timer Styles */
+        .pomodoro-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1rem;
+            width: 250px;
+            z-index: 100;
+        }
+
+        .pomodoro-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .pomodoro-timer {
+            font-size: 2rem;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .pomodoro-controls {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+
+        .pomodoro-mode {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .pomodoro-mode-btn {
+            flex: 1;
+            padding: 0.5rem;
+            background-color: #e0e0e0;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .pomodoro-mode-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Time Tracking Styles */
+        .time-tracking {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1rem;
+            width: 200px;
+            z-index: 100;
+        }
+
+        .time-tracking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .time-tracking-display {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: auto;
+                max-height: 60px;
+                overflow: hidden;
+            }
+
+            .sidebar.expanded {
+                max-height: 100vh;
+            }
+
+            .sidebar-toggle {
+                display: block;
+            }
+
+            .content-area {
+                flex-direction: column;
+            }
+
+            .materials-panel {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+
+            .pomodoro-container, .time-tracking {
+                position: static;
+                width: 100%;
+                margin: 1rem;
+            }
+        }
+
+        /* Utility Classes */
+        .d-none {
+            display: none;
+        }
+
+        .d-flex {
+            display: flex;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .align-center {
+            align-items: center;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-1 {
+            margin-top: 0.5rem;
+        }
+
+        .mt-2 {
+            margin-top: 1rem;
+        }
+
+        .mb-1 {
+            margin-bottom: 0.5rem;
+        }
+
+        .mb-2 {
+            margin-bottom: 1rem;
+        }
+
+        .gap-1 {
+            gap: 0.5rem;
+        }
+
+        .w-100 {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar Navigation -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>Study Tracker</h2>
+                <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+            </div>
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active" data-view="dashboard">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-view="study-plan">Today's Plan</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-view="review-later">Review Later</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-view="reminders">Reminders</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-view="analytics">Analytics</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-view="settings">Settings</a>
+                </li>
+            </ul>
+            <div class="subject-list" id="subjectList">
+                <!-- Subjects will be populated here -->
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <div class="header">
+                <h1 id="pageTitle">Dashboard</h1>
+                <div class="header-actions">
+                    <button class="btn" id="exportBtn">Export Data</button>
+                    <button class="btn" id="importBtn">Import Data</button>
+                    <input type="file" id="importFile" class="d-none" accept=".json">
+                </div>
+            </div>
+
+            <div class="content-area">
+                <!-- Materials Panel -->
+                <div class="materials-panel">
+                    <div class="panel-header">
+                        <h3 class="panel-title">Materials</h3>
+                        <button class="btn btn-sm" id="addMaterialBtn">Add Material</button>
+                    </div>
+                    <div id="materialsList">
+                        <!-- Materials will be populated here -->
+                    </div>
+                </div>
+
+                <!-- Subtopics Panel -->
+                <div class="subtopics-panel">
+                    <div class="panel-header">
+                        <h3 class="panel-title">Subtopics</h3>
+                        <div>
+                            <button class="btn btn-sm" id="addSubtopicBtn">Add Subtopic</button>
+                            <button class="btn btn-sm" id="addToPlanBtn">Add to Today's Plan</button>
+                        </div>
+                    </div>
+                    <div id="subtopicsList">
+                        <!-- Subtopics will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pomodoro Timer -->
+    <div class="pomodoro-container">
+        <div class="pomodoro-header">
+            <h3>Pomodoro Timer</h3>
+            <button class="btn btn-sm" id="minimizePomodoro">−</button>
+        </div>
+        <div class="pomodoro-mode">
+            <button class="pomodoro-mode-btn active" data-mode="pomodoro">Focus</button>
+            <button class="pomodoro-mode-btn" data-mode="shortBreak">Short Break</button>
+            <button class="pomodoro-mode-btn" data-mode="longBreak">Long Break</button>
+        </div>
+        <div class="pomodoro-timer" id="pomodoroTimer">25:00</div>
+        <div class="pomodoro-controls">
+            <button class="btn btn-success" id="startPomodoro">Start</button>
+            <button class="btn btn-warning" id="pausePomodoro">Pause</button>
+            <button class="btn btn-danger" id="resetPomodoro">Reset</button>
+        </div>
+    </div>
+
+    <!-- Time Tracking -->
+    <div class="time-tracking">
+        <div class="time-tracking-header">
+            <h3>Study Time</h3>
+            <button class="btn btn-sm" id="minimizeTimeTracking">−</button>
+        </div>
+        <div class="time-tracking-display" id="timeTrackingDisplay">00:00:00</div>
+        <div class="pomodoro-controls">
+            <button class="btn btn-success" id="startTimeTracking">Start</button>
+            <button class="btn btn-warning" id="pauseTimeTracking">Pause</button>
+            <button class="btn btn-danger" id="resetTimeTracking">Reset</button>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- Add/Edit Subject Modal -->
+    <div class="modal" id="subjectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="subjectModalTitle">Add Subject</h3>
+                <button class="modal-close" id="closeSubjectModal">&times;</button>
+            </div>
+            <form id="subjectForm">
+                <div class="form-group">
+                    <label class="form-label" for="subjectName">Subject Name</label>
+                    <input type="text" class="form-control" id="subjectName" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" id="cancelSubjectBtn">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add/Edit Material Modal -->
+    <div class="modal" id="materialModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="materialModalTitle">Add Material</h3>
+                <button class="modal-close" id="closeMaterialModal">&times;</button>
+            </div>
+            <form id="materialForm">
+                <div class="form-group">
+                    <label class="form-label" for="materialName">Material Name</label>
+                    <input type="text" class="form-control" id="materialName" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="materialSubject">Subject</label>
+                    <select class="form-select" id="materialSubject" required>
+                        <!-- Subjects will be populated here -->
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" id="cancelMaterialBtn">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add/Edit Subtopic Modal -->
+    <div class="modal" id="subtopicModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="subtopicModalTitle">Add Subtopic</h3>
+                <button class="modal-close" id="closeSubtopicModal">&times;</button>
+            </div>
+            <form id="subtopicForm">
+                <div class="form-group">
+                    <label class="form-label" for="subtopicTitle">Subtopic Title</label>
+                    <input type="text" class="form-control" id="subtopicTitle" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="subtopicMaterial">Material</label>
+                    <select class="form-select" id="subtopicMaterial" required>
+                        <!-- Materials will be populated here -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="subtopicStatus">Status</label>
+                    <select class="form-select" id="subtopicStatus" required>
+                        <option value="not_started">Not Started</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="subtopicNotes">Notes</label>
+                    <textarea class="form-control" id="subtopicNotes" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" id="subtopicFlagReview"> Flag for Review
+                    </label>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" id="cancelSubtopicBtn">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add/Edit Reminder Modal -->
+    <div class="modal" id="reminderModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="reminderModalTitle">Add Reminder</h3>
+                <button class="modal-close" id="closeReminderModal">&times;</button>
+            </div>
+            <form id="reminderForm">
+                <div class="form-group">
+                    <label class="form-label" for="reminderTitle">Reminder Title</label>
+                    <input type="text" class="form-control" id="reminderTitle" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="reminderDateTime">Date & Time</label>
+                    <input type="datetime-local" class="form-control" id="reminderDateTime" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="reminderRepeat">Repeat</label>
+                    <select class="form-select" id="reminderRepeat">
+                        <option value="none">No Repeat</option>
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn" id="cancelReminderBtn">Cancel</button>
+                    <button type="submit" class="btn btn-success">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal" id="confirmationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="confirmationModalTitle">Confirm Action</h3>
+                <button class="modal-close" id="closeConfirmationModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmationMessage">Are you sure you want to perform this action?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" id="cancelConfirmationBtn">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmActionBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Today's Plan View -->
+    <div class="modal" id="todayPlanModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Today's Study Plan</h3>
+                <button class="modal-close" id="closeTodayPlanModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Auto-populate Plan</label>
+                    <div class="d-flex gap-1">
+                        <input type="number" class="form-control" id="autoPopulateCount" min="1" value="5">
+                        <button class="btn" id="autoPopulateIncompleteBtn">Add Incomplete</button>
+                        <button class="btn" id="autoPopulateReviewBtn">Add Review Items</button>
+                    </div>
+                </div>
+                <div id="todayPlanList">
+                    <!-- Today's plan items will be populated here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" id="closeTodayPlanBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Permission Request -->
+    <div class="modal" id="notificationPermissionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Enable Notifications</h3>
+            </div>
+            <div class="modal-body">
+                <p>This app would like to send you reminders. Please allow notifications in your browser to use this feature.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn" id="denyNotificationsBtn">Not Now</button>
+                <button type="button" class="btn btn-success" id="allowNotificationsBtn">Allow Notifications</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =============================================================================
+        // DATA MODEL AND INITIALIZATION
+        // =============================================================================
+
+        // Seed data for initial setup
+        const seedData = {
+            subjects: [
+                {
+                    id: 's1',
+                    name: 'Psychological Assessment',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    order: 0
+                },
+                {
+                    id: 's2',
+                    name: 'Theories of Personality',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    order: 1
+                },
+                {
+                    id: 's3',
+                    name: 'Abnormal Psychology',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    order: 2
+                }
+            ],
+            materials: [
+                {
+                    id: 'm1',
+                    subjectId: 's1',
+                    name: 'Psychological Testing and Assessment',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    order: 0
+                },
+                {
+                    id: 'm2',
+                    subjectId: 's1',
+                    name: 'Test Construction and Validation',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    order: 1
+                },
+                {
+                    id: 'm3',
+                    subjectId: 's2',
+                    name: 'Psychoanalytic Theories',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    order: 0
+                },
+                {
+                    id: 'm4',
+                    subjectId: 's3',
+                    name: 'Diagnostic Criteria',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    order: 0
+                }
+            ],
+            subtopics: [
+                {
+                    id: 'st1',
+                    materialId: 'm1',
+                    title: 'History of Psychological Testing',
+                    status: 'completed',
+                    notes: 'Covered early developments and key figures',
+                    flagReview: false,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    order: 0
+                },
+                {
+                    id: 'st2',
+                    materialId: 'm1',
+                    title: 'Reliability and Validity',
+                    status: 'in_progress',
+                    notes: 'Need to review types of validity',
+                    flagReview: true,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    order: 1
+                },
+                {
+                    id: 'st3',
+                    materialId: 'm2',
+                    title: 'Item Analysis',
+                    status: 'not_started',
+                    notes: '',
+                    flagReview: false,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    order: 0
+                },
+                {
+                    id: 'st4',
+                    materialId: 'm3',
+                    title: 'Freudian Theory',
+                    status: 'completed',
+                    notes: 'Covered id, ego, superego',
+                    flagReview: false,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    order: 0
+                },
+                {
+                    id: 'st5',
+                    materialId: 'm4',
+                    title: 'Mood Disorders',
+                    status: 'in_progress',
+                    notes: 'Focus on differential diagnosis',
+                    flagReview: true,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    order: 0
+                }
+            ],
+            todayPlan: [],
+            reminders: [],
+            settings: {
+                notificationsEnabled: false,
+                lastExport: null
+            },
+            pomodoroSettings: {
+                pomodoroTime: 25 * 60, // 25 minutes in seconds
+                shortBreakTime: 5 * 60, // 5 minutes in seconds
+                longBreakTime: 15 * 60, // 15 minutes in seconds
+                autoStartBreaks: false,
+                autoStartPomodoros: false,
+                longBreakInterval: 4
+            },
+            timeTracking: {
+                totalTimeToday: 0, // in seconds
+                isTracking: false,
+                startTime: null
+            }
+        };
+
+        // App state
+        let appState = {
+            subjects: [],
+            materials: [],
+            subtopics: [],
+            todayPlan: [],
+            reminders: [],
+            settings: {},
+            pomodoroSettings: {},
+            timeTracking: {},
+            currentView: 'dashboard',
+            selectedSubject: null,
+            selectedMaterial: null,
+            editingItem: null
+        };
+
+        // Pomodoro state
+        let pomodoroState = {
+            mode: 'pomodoro', // 'pomodoro', 'shortBreak', 'longBreak'
+            timeLeft: 25 * 60, // in seconds
+            isRunning: false,
+            intervalId: null,
+            completedPomodoros: 0
+        };
+
+        // Initialize the app
+        function initApp() {
+            loadData();
+            setupEventListeners();
+            renderApp();
+            checkNotificationPermission();
+            initPomodoro();
+            initTimeTracking();
+            
+            // Show notification permission modal if not yet decided
+            if (Notification.permission === 'default') {
+                setTimeout(() => {
+                    document.getElementById('notificationPermissionModal').style.display = 'flex';
+                }, 1000);
+            }
+        }
+
+        // =============================================================================
+        // DATA PERSISTENCE
+        // =============================================================================
+
+        // Load data from localStorage or initialize with seed data
+        function loadData() {
+            const storedData = localStorage.getItem('studyTrackerData');
+            
+            if (storedData) {
+                try {
+                    appState = { ...appState, ...JSON.parse(storedData) };
+                // Initialize time tracking for today
+                    const today = new Date().toDateString();
+                    if (!appState.timeTracking.lastTrackingDate || appState.timeTracking.lastTrackingDate !== today) {
+                        appState.timeTracking.totalTimeToday = 0;
+                        appState.timeTracking.lastTrackingDate = today;
+                    }
+                } catch (error) {
+                    console.error('Error parsing stored data:', error);
+                    initializeWithSeedData();
+                }
+            } else {
+                initializeWithSeedData();
+            }
+        }
+
+        // Initialize with seed data
+        function initializeWithSeedData() {
+            appState = { ...appState, ...seedData };
+            // Initialize time tracking for today
+            appState.timeTracking.lastTrackingDate = new Date().toDateString();
+            saveData();
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            try {
+                localStorage.setItem('studyTrackerData', JSON.stringify(appState));
+            } catch (error) {
+                console.error('Error saving data:', error);
+                alert('Error saving data. Storage might be full.');
+            }
+        }
+
+        // Export data as JSON file
+        function exportData() {
+            const dataStr = JSON.stringify(appState, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `study-tracker-backup-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            // Update last export timestamp
+            appState.settings.lastExport = new Date().toISOString();
+            saveData();
+        }
+
+        // Import data from JSON file
+        function importData(file, merge = false) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const importedData = JSON.parse(e.target.result);
+                    
+                    if (merge) {
+                        // Merge data (more complex implementation needed for production)
+                        appState.subjects = [...appState.subjects, ...importedData.subjects];
+                        appState.materials = [...appState.materials, ...importedData.materials];
+                        appState.subtopics = [...appState.subtopics, ...importedData.subtopics];
+                        // Handle duplicates by ID would be needed in a production app
+                    } else {
+                        // Replace data
+                        appState = { ...appState, ...importedData };
+                    }
+                    
+                    saveData();
+                    renderApp();
+                    alert('Data imported successfully!');
+                } catch (error) {
+                    console.error('Error importing data:', error);
+                    alert('Error importing data. Please check the file format.');
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+
+        // =============================================================================
+        // UI RENDERING
+        // =============================================================================
+
+        // Render the entire app based on current state
+        function renderApp() {
+            renderNavigation();
+            renderSubjects();
+            renderMaterials();
+            renderSubtopics();
+            renderCurrentView();
+        }
+
+        // Render navigation with active state
+        function renderNavigation() {
+            document.querySelectorAll('.nav-link').forEach(link => {
+                if (link.getAttribute('data-view') === appState.currentView) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+            
+            // Update page title
+            document.getElementById('pageTitle').textContent = 
+                appState.currentView.charAt(0).toUpperCase() + appState.currentView.slice(1).replace('-', ' ');
+        }
+
+        // Render subjects list
+        function renderSubjects() {
+            const subjectList = document.getElementById('subjectList');
+            subjectList.innerHTML = '';
+            
+            // Add subject button
+            const addSubjectItem = document.createElement('div');
+            addSubjectItem.className = 'subject-item';
+            addSubjectItem.innerHTML = `
+                <div class="d-flex justify-between align-center">
+                    <span>Add New Subject</span>
+                    <button class="btn btn-sm" id="addSubjectBtn">+</button>
+                </div>
+            `;
+            subjectList.appendChild(addSubjectItem);
+            
+            // Sort subjects by order
+            const sortedSubjects = [...appState.subjects].sort((a, b) => a.order - b.order);
+            
+            // Subject items
+            sortedSubjects.forEach(subject => {
+                const subjectItem = document.createElement('div');
+                subjectItem.className = `subject-item ${appState.selectedSubject === subject.id ? 'active' : ''}`;
+                subjectItem.setAttribute('draggable', 'true');
+                subjectItem.setAttribute('data-id', subject.id);
+                subjectItem.setAttribute('data-type', 'subject');
+                subjectItem.innerHTML = `
+                    <div class="d-flex justify-between align-center">
+                        <span>${subject.name}</span>
+                        <div>
+                            <button class="btn btn-sm edit-subject" data-id="${subject.id}">✏️</button>
+                            <button class="btn btn-sm delete-subject" data-id="${subject.id}">🗑️</button>
+                        </div>
+                    </div>
+                `;
+                subjectList.appendChild(subjectItem);
+            });
+            
+            // Add event listeners for subject actions
+            document.getElementById('addSubjectBtn').addEventListener('click', () => openSubjectModal());
+            document.querySelectorAll('.edit-subject').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const subjectId = btn.getAttribute('data-id');
+                    openSubjectModal(subjectId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-subject').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const subjectId = btn.getAttribute('data-id');
+                    deleteSubject(subjectId);
+                });
+            });
+            
+            // Subject selection
+            document.querySelectorAll('.subject-item[data-id]').forEach(item => {
+                item.addEventListener('click', () => {
+                    const subjectId = item.getAttribute('data-id');
+                    appState.selectedSubject = subjectId;
+                    appState.selectedMaterial = null;
+                    renderApp();
+                });
+            });
+        }
+
+        // Render materials list
+        function renderMaterials() {
+            const materialsList = document.getElementById('materialsList');
+            materialsList.innerHTML = '';
+            
+            // Filter materials by selected subject if any
+            let filteredMaterials = appState.materials;
+            if (appState.selectedSubject) {
+                filteredMaterials = appState.materials.filter(m => m.subjectId === appState.selectedSubject);
+            }
+            
+            // Sort materials by order
+            const sortedMaterials = [...filteredMaterials].sort((a, b) => a.order - b.order);
+            
+            // Material items
+            sortedMaterials.forEach(material => {
+                const subject = appState.subjects.find(s => s.id === material.subjectId);
+                const materialCard = document.createElement('div');
+                materialCard.className = `card ${appState.selectedMaterial === material.id ? 'active' : ''}`;
+                materialCard.setAttribute('draggable', 'true');
+                materialCard.setAttribute('data-id', material.id);
+                materialCard.setAttribute('data-type', 'material');
+                materialCard.innerHTML = `
+                    <div class="d-flex justify-between align-center mb-1">
+                        <h4>${material.name}</h4>
+                        <div>
+                            <button class="btn btn-sm edit-material" data-id="${material.id}">✏️</button>
+                            <button class="btn btn-sm delete-material" data-id="${material.id}">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="text-small">${subject ? subject.name : 'Unknown Subject'}</div>
+                    <div class="progress-container mt-1">
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${calculateMaterialProgress(material.id)}%"></div>
+                        </div>
+                        <div class="progress-text">${calculateMaterialProgress(material.id)}% Complete</div>
+                    </div>
+                `;
+                materialsList.appendChild(materialCard);
+            });
+            
+            // Add event listeners for material actions
+            document.querySelectorAll('.edit-material').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const materialId = btn.getAttribute('data-id');
+                    openMaterialModal(materialId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-material').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const materialId = btn.getAttribute('data-id');
+                    deleteMaterial(materialId);
+                });
+            });
+            
+            // Material selection
+            document.querySelectorAll('.card[data-id]').forEach(card => {
+                card.addEventListener('click', () => {
+                    const materialId = card.getAttribute('data-id');
+                    appState.selectedMaterial = materialId;
+                    renderApp();
+                });
+            });
+        }
+
+        // Render subtopics list
+        function renderSubtopics() {
+            const subtopicsList = document.getElementById('subtopicsList');
+            subtopicsList.innerHTML = '';
+            
+            // Filter subtopics by selected material if any
+            let filteredSubtopics = appState.subtopics;
+            if (appState.selectedMaterial) {
+                filteredSubtopics = appState.subtopics.filter(st => st.materialId === appState.selectedMaterial);
+            } else if (appState.selectedSubject) {
+                // If a subject is selected but no material, show all subtopics for that subject
+                const subjectMaterials = appState.materials.filter(m => m.subjectId === appState.selectedSubject);
+                const materialIds = subjectMaterials.map(m => m.id);
+                filteredSubtopics = appState.subtopics.filter(st => materialIds.includes(st.materialId));
+            }
+            
+            // Sort subtopics: incomplete first, then by order
+            const sortedSubtopics = [...filteredSubtopics].sort((a, b) => {
+                // Completed items go to the bottom
+                if (a.status === 'completed' && b.status !== 'completed') return 1;
+                if (a.status !== 'completed' && b.status === 'completed') return -1;
+                // Then sort by order
+                return a.order - b.order;
+            });
+            
+            // Subtopic items
+            sortedSubtopics.forEach(subtopic => {
+                const material = appState.materials.find(m => m.id === subtopic.materialId);
+                const subject = appState.subjects.find(s => s.id === material?.subjectId);
+                
+                const subtopicCard = document.createElement('div');
+                subtopicCard.className = 'card';
+                subtopicCard.setAttribute('draggable', 'true');
+                subtopicCard.setAttribute('data-id', subtopic.id);
+                subtopicCard.setAttribute('data-type', 'subtopic');
+                subtopicCard.innerHTML = `
+                    <div class="d-flex justify-between align-center mb-1">
+                        <h4>${subtopic.title}</h4>
+                        <div>
+                            <span class="flag-icon ${subtopic.flagReview ? 'flagged' : ''}" data-id="${subtopic.id}">🚩</span>
+                            <button class="btn btn-sm edit-subtopic" data-id="${subtopic.id}">✏️</button>
+                            <button class="btn btn-sm delete-subtopic" data-id="${subtopic.id}">🗑️</button>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-between align-center mb-1">
+                        <span class="status-badge status-${subtopic.status}">${formatStatus(subtopic.status)}</span>
+                        <div class="text-small">${material ? material.name : 'Unknown Material'}${subject ? ` (${subject.name})` : ''}</div>
+                    </div>
+                    ${subtopic.notes ? `<div class="notes mt-1">${subtopic.notes}</div>` : ''}
+                    <div class="d-flex justify-between mt-2">
+                        <button class="btn btn-sm toggle-status" data-id="${subtopic.id}">
+                            ${subtopic.status === 'completed' ? 'Mark Incomplete' : 'Mark Complete'}
+                        </button>
+                        <button class="btn btn-sm add-to-plan" data-id="${subtopic.id}">Add to Plan</button>
+                    </div>
+                `;
+                subtopicsList.appendChild(subtopicCard);
+            });
+            
+            // Add event listeners for subtopic actions
+            document.querySelectorAll('.edit-subtopic').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const subtopicId = btn.getAttribute('data-id');
+                    openSubtopicModal(subtopicId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-subtopic').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const subtopicId = btn.getAttribute('data-id');
+                    deleteSubtopic(subtopicId);
+                });
+            });
+            
+            document.querySelectorAll('.toggle-status').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const subtopicId = btn.getAttribute('data-id');
+                    toggleSubtopicStatus(subtopicId);
+                });
+            });
+            
+            document.querySelectorAll('.add-to-plan').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const subtopicId = btn.getAttribute('data-id');
+                    addToTodayPlan(subtopicId);
+                });
+            });
+            
+            document.querySelectorAll('.flag-icon').forEach(icon => {
+                icon.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const subtopicId = icon.getAttribute('data-id');
+                    toggleFlagReview(subtopicId);
+                });
+            });
+        }
+
+        // Render the current view (dashboard, study-plan, etc.)
+        function renderCurrentView() {
+            // Hide all views first
+            document.querySelectorAll('.view').forEach(view => {
+                view.style.display = 'none';
+            });
+            
+            // Show the current view
+            const currentViewElement = document.getElementById(`${appState.currentView}-view`);
+            if (currentViewElement) {
+                currentViewElement.style.display = 'block';
+            }
+            
+            // Special rendering for certain views
+            if (appState.currentView === 'study-plan') {
+                renderTodayPlan();
+            } else if (appState.currentView === 'reminders') {
+                renderReminders();
+            } else if (appState.currentView === 'analytics') {
+                renderAnalytics();
+            }
+        }
+
+        // Render today's study plan
+        function renderTodayPlan() {
+            const todayPlanList = document.getElementById('todayPlanList');
+            todayPlanList.innerHTML = '';
+            
+            if (appState.todayPlan.length === 0) {
+                todayPlanList.innerHTML = '<p class="text-center">No items in today\'s plan. Add some subtopics to get started!</p>';
+                return;
+            }
+            
+            appState.todayPlan.forEach((item, index) => {
+                const subtopic = appState.subtopics.find(st => st.id === item.subtopicId);
+                if (!subtopic) return;
+                
+                const material = appState.materials.find(m => m.id === subtopic.materialId);
+                const subject = appState.subjects.find(s => s.id === material?.subjectId);
+                
+                const planItem = document.createElement('div');
+                planItem.className = 'today-plan-item';
+                planItem.setAttribute('draggable', 'true');
+                planItem.setAttribute('data-index', index);
+                planItem.setAttribute('data-type', 'today-plan');
+                planItem.innerHTML = `
+                    <div>
+                        <div class="d-flex align-center gap-1">
+                            <h4>${subtopic.title}</h4>
+                            <span class="status-badge status-${subtopic.status}">${formatStatus(subtopic.status)}</span>
+                        </div>
+                        <div class="text-small">${material ? material.name : 'Unknown Material'}${subject ? ` (${subject.name})` : ''}</div>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm remove-from-plan" data-index="${index}">Remove</button>
+                    </div>
+                `;
+                todayPlanList.appendChild(planItem);
+            });
+            
+            // Add event listeners for plan actions
+            document.querySelectorAll('.remove-from-plan').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const index = parseInt(btn.getAttribute('data-index'));
+                    removeFromTodayPlan(index);
+                });
+            });
+        }
+
+        // Render reminders
+        function renderReminders() {
+            // Implementation for reminders view
+            // This would show a list of upcoming reminders with options to add/edit/delete
+        }
+
+        // Render analytics
+        function renderAnalytics() {
+            // Implementation for analytics view
+            // This would show charts and statistics about study progress
+        }
+
+        // =============================================================================
+        // DRAG AND DROP FUNCTIONALITY
+        // =============================================================================
+
+        // Initialize drag and drop functionality
+        function initDragAndDrop() {
+            const draggables = document.querySelectorAll('[draggable="true"]');
+            
+            draggables.forEach(draggable => {
+                draggable.addEventListener('dragstart', handleDragStart);
+                draggable.addEventListener('dragend', handleDragEnd);
+                draggable.addEventListener('dragover', handleDragOver);
+                draggable.addEventListener('dragenter', handleDragEnter);
+                draggable.addEventListener('dragleave', handleDragLeave);
+                draggable.addEventListener('drop', handleDrop);
+            });
+        }
+
+        // Handle drag start event
+        function handleDragStart(e) {
+            e.dataTransfer.setData('text/plain', JSON.stringify({
+                id: this.getAttribute('data-id'),
+                type: this.getAttribute('data-type'),
+                index: this.getAttribute('data-index')
+            }));
+            this.classList.add('dragging');
+            
+            // Set drag image to be the element itself
+            e.dataTransfer.setDragImage(this, 0, 0);
+        }
+
+        // Handle drag end event
+        function handleDragEnd(e) {
+            this.classList.remove('dragging');
+            document.querySelectorAll('.drag-over').forEach(el => {
+                el.classList.remove('drag-over');
+            });
+        }
+
+        // Handle drag over event
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        // Handle drag enter event
+        function handleDragEnter(e) {
+            e.preventDefault();
+            this.classList.add('drag-over');
+        }
+
+        // Handle drag leave event
+        function handleDragLeave(e) {
+            this.classList.remove('drag-over');
+        }
+
+        // Handle drop event
+        function handleDrop(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            
+            const data = JSON.parse(e.dataTransfer.getData('text/plain'));
+            const targetType = this.getAttribute('data-type');
+            const targetId = this.getAttribute('data-id');
+            const targetIndex = this.getAttribute('data-index');
+            
+            // Handle different drop scenarios
+            if (data.type === 'subject' && targetType === 'subject') {
+                // Reorder subjects
+                reorderItems('subjects', data.id, targetId);
+            } else if (data.type === 'material' && targetType === 'material') {
+                // Reorder materials
+                reorderItems('materials', data.id, targetId);
+            } else if (data.type === 'subtopic' && targetType === 'subtopic') {
+                // Reorder subtopics
+                reorderItems('subtopics', data.id, targetId);
+            } else if (data.type === 'today-plan' && targetType === 'today-plan') {
+                // Reorder today's plan
+                reorderTodayPlan(parseInt(data.index), parseInt(targetIndex));
+            }
+            
+            renderApp();
+        }
+
+        // Reorder items in a collection
+        function reorderItems(collection, draggedId, targetId) {
+            const items = appState[collection];
+            const draggedIndex = items.findIndex(item => item.id === draggedId);
+            const targetIndex = items.findIndex(item => item.id === targetId);
+            
+            if (draggedIndex === -1 || targetIndex === -1) return;
+            
+            // Remove dragged item
+            const [draggedItem] = items.splice(draggedIndex, 1);
+            
+            // Insert at target position
+            items.splice(targetIndex, 0, draggedItem);
+            
+            // Update order property for all items
+            items.forEach((item, index) => {
+                item.order = index;
+                item.updatedAt = new Date().toISOString();
+            });
+            
+            saveData();
+        }
+
+        // Reorder today's plan
+        function reorderTodayPlan(fromIndex, toIndex) {
+            if (fromIndex === toIndex) return;
+            
+            const [item] = appState.todayPlan.splice(fromIndex, 1);
+            appState.todayPlan.splice(toIndex, 0, item);
+            
+            saveData();
+        }
+
+        // =============================================================================
+        // POMODORO TIMER FUNCTIONALITY
+        // =============================================================================
+
+        // Initialize Pomodoro timer
+        function initPomodoro() {
+            updatePomodoroDisplay();
+        }
+
+        // Start Pomodoro timer
+        function startPomodoro() {
+            if (pomodoroState.isRunning) return;
+            
+            pomodoroState.isRunning = true;
+            pomodoroState.intervalId = setInterval(() => {
+                pomodoroState.timeLeft--;
+                updatePomodoroDisplay();
+                
+                if (pomodoroState.timeLeft <= 0) {
+                    completePomodoroSession();
+                }
+            }, 1000);
+            
+            document.getElementById('startPomodoro').textContent = 'Resume';
+            document.getElementById('pausePomodoro').disabled = false;
+        }
+
+        // Pause Pomodoro timer
+        function pausePomodoro() {
+            if (!pomodoroState.isRunning) return;
+            
+            pomodoroState.isRunning = false;
+            clearInterval(pomodoroState.intervalId);
+            
+            document.getElementById('pausePomodoro').disabled = true;
+        }
+
+        // Reset Pomodoro timer
+        function resetPomodoro() {
+            pomodoroState.isRunning = false;
+            clearInterval(pomodoroState.intervalId);
+            
+            // Reset to current mode's default time
+            if (pomodoroState.mode === 'pomodoro') {
+                pomodoroState.timeLeft = appState.pomodoroSettings.pomodoroTime;
+            } else if (pomodoroState.mode === 'shortBreak') {
+                pomodoroState.timeLeft = appState.pomodoroSettings.shortBreakTime;
+            } else if (pomodoroState.mode === 'longBreak') {
+                pomodoroState.timeLeft = appState.pomodoroSettings.longBreakTime;
+            }
+            
+            updatePomodoroDisplay();
+            document.getElementById('startPomodoro').textContent = 'Start';
+            document.getElementById('pausePomodoro').disabled = true;
+        }
+
+        // Complete a Pomodoro session
+        function completePomodoroSession() {
+            pomodoroState.isRunning = false;
+            clearInterval(pomodoroState.intervalId);
+            
+            // Show notification
+            if (appState.settings.notificationsEnabled) {
+                showNotification(
+                    'Pomodoro Complete!',
+                    `Your ${pomodoroState.mode === 'pomodoro' ? 'focus session' : 'break'} is over.`
+                );
+            }
+            
+            // Update completed pomodoros
+            if (pomodoroState.mode === 'pomodoro') {
+                pomodoroState.completedPomodoros++;
+                
+                // Check if it's time for a long break
+                if (pomodoroState.completedPomodoros % appState.pomodoroSettings.longBreakInterval === 0) {
+                    switchPomodoroMode('longBreak');
+                } else {
+                    switchPomodoroMode('shortBreak');
+                }
+            } else {
+                // Break is over, switch back to pomodoro
+                switchPomodoroMode('pomodoro');
+            }
+            
+            // Auto-start next session if enabled
+            if ((pomodoroState.mode === 'pomodoro' && appState.pomodoroSettings.autoStartPomodoros) ||
+                (pomodoroState.mode !== 'pomodoro' && appState.pomodoroSettings.autoStartBreaks)) {
+                setTimeout(startPomodoro, 1000);
+            }
+        }
+
+        // Switch Pomodoro mode
+        function switchPomodoroMode(mode) {
+            pomodoroState.mode = mode;
+            
+            // Update active button
+            document.querySelectorAll('.pomodoro-mode-btn').forEach(btn => {
+                if (btn.getAttribute('data-mode') === mode) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Reset timer for new mode
+            resetPomodoro();
+        }
+
+        // Update Pomodoro display
+        function updatePomodoroDisplay() {
+            const minutes = Math.floor(pomodoroState.timeLeft / 60);
+            const seconds = pomodoroState.timeLeft % 60;
+            document.getElementById('pomodoroTimer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // =============================================================================
+        // TIME TRACKING FUNCTIONALITY
+        // =============================================================================
+
+        // Initialize time tracking
+        function initTimeTracking() {
+            updateTimeTrackingDisplay();
+            
+            // Load today's time from storage
+            const today = new Date().toDateString();
+            if (appState.timeTracking.lastTrackingDate !== today) {
+                appState.timeTracking.totalTimeToday = 0;
+                appState.timeTracking.lastTrackingDate = today;
+                saveData();
+            }
+        }
+
+        // Start time tracking
+        function startTimeTracking() {
+            if (appState.timeTracking.isTracking) return;
+            
+            appState.timeTracking.isTracking = true;
+            appState.timeTracking.startTime = new Date();
+            
+            // Start time tracking interval
+            appState.timeTracking.intervalId = setInterval(() => {
+                appState.timeTracking.totalTimeToday++;
+                updateTimeTrackingDisplay();
+            }, 1000);
+            
+            document.getElementById('startTimeTracking').disabled = true;
+            document.getElementById('pauseTimeTracking').disabled = false;
+        }
+
+        // Pause time tracking
+        function pauseTimeTracking() {
+            if (!appState.timeTracking.isTracking) return;
+            
+            appState.timeTracking.isTracking = false;
+            clearInterval(appState.timeTracking.intervalId);
+            
+            // Calculate elapsed time and add to total
+            if (appState.timeTracking.startTime) {
+                const elapsedSeconds = Math.floor((new Date() - appState.timeTracking.startTime) / 1000);
+                appState.timeTracking.totalTimeToday += elapsedSeconds;
+                appState.timeTracking.startTime = null;
+            }
+            
+            saveData();
+            updateTimeTrackingDisplay();
+            
+            document.getElementById('startTimeTracking').disabled = false;
+            document.getElementById('pauseTimeTracking').disabled = true;
+        }
+
+        // Reset time tracking
+        function resetTimeTracking() {
+            appState.timeTracking.isTracking = false;
+            clearInterval(appState.timeTracking.intervalId);
+            appState.timeTracking.totalTimeToday = 0;
+            appState.timeTracking.startTime = null;
+            
+            saveData();
+            updateTimeTrackingDisplay();
+            
+            document.getElementById('startTimeTracking').disabled = false;
+            document.getElementById('pauseTimeTracking').disabled = true;
+        }
+
+        // Update time tracking display
+        function updateTimeTrackingDisplay() {
+            const totalSeconds = appState.timeTracking.totalTimeToday;
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            
+            document.getElementById('timeTrackingDisplay').textContent = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // =============================================================================
+        // NOTIFICATION FUNCTIONALITY
+        // =============================================================================
+
+        // Check notification permission
+        function checkNotificationPermission() {
+            if (!('Notification' in window)) {
+                console.log('This browser does not support notifications');
+                return;
+            }
+            
+            if (Notification.permission === 'granted') {
+                appState.settings.notificationsEnabled = true;
+            } else if (Notification.permission === 'denied') {
+                appState.settings.notificationsEnabled = false;
+            }
+            // If permission is 'default', we'll ask later
+        }
+
+        // Request notification permission
+        function requestNotificationPermission() {
+            if (!('Notification' in window)) {
+                alert('This browser does not support notifications');
+                return;
+            }
+            
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    appState.settings.notificationsEnabled = true;
+                    document.getElementById('notificationPermissionModal').style.display = 'none';
+                    saveData();
+                    showNotification('Notifications Enabled', 'You will now receive reminders and alerts.');
+                } else {
+                    appState.settings.notificationsEnabled = false;
+                    document.getElementById('notificationPermissionModal').style.display = 'none';
+                    saveData();
+                }
+            });
+        }
+
+        // Show notification
+        function showNotification(title, body) {
+            if (!appState.settings.notificationsEnabled) return;
+            
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification(title, { body, icon: '/favicon.ico' });
+            }
+        }
+
+        // =============================================================================
+        // MODAL MANAGEMENT
+        // =============================================================================
+
+        // Open subject modal for adding/editing
+        function openSubjectModal(subjectId = null) {
+            const modal = document.getElementById('subjectModal');
+            const form = document.getElementById('subjectForm');
+            const title = document.getElementById('subjectModalTitle');
+            
+            if (subjectId) {
+                // Editing existing subject
+                const subject = appState.subjects.find(s => s.id === subjectId);
+                if (!subject) return;
+                
+                title.textContent = 'Edit Subject';
+                document.getElementById('subjectName').value = subject.name;
+                appState.editingItem = { type: 'subject', id: subjectId };
+            } else {
+                // Adding new subject
+                title.textContent = 'Add Subject';
+                form.reset();
+                appState.editingItem = { type: 'subject', id: null };
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        // Open material modal for adding/editing
+        function openMaterialModal(materialId = null) {
+            const modal = document.getElementById('materialModal');
+            const form = document.getElementById('materialForm');
+            const title = document.getElementById('materialModalTitle');
+            const subjectSelect = document.getElementById('materialSubject');
+            
+            // Populate subject dropdown
+            subjectSelect.innerHTML = '';
+            appState.subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject.id;
+                option.textContent = subject.name;
+                subjectSelect.appendChild(option);
+            });
+            
+            if (materialId) {
+                // Editing existing material
+                const material = appState.materials.find(m => m.id === materialId);
+                if (!material) return;
+                
+                title.textContent = 'Edit Material';
+                document.getElementById('materialName').value = material.name;
+                subjectSelect.value = material.subjectId;
+                appState.editingItem = { type: 'material', id: materialId };
+            } else {
+                // Adding new material
+                title.textContent = 'Add Material';
+                form.reset();
+                
+                // Pre-select current subject if one is selected
+                if (appState.selectedSubject) {
+                    subjectSelect.value = appState.selectedSubject;
+                }
+                
+                appState.editingItem = { type: 'material', id: null };
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        // Open subtopic modal for adding/editing
+        function openSubtopicModal(subtopicId = null) {
+            const modal = document.getElementById('subtopicModal');
+            const form = document.getElementById('subtopicForm');
+            const title = document.getElementById('subtopicModalTitle');
+            const materialSelect = document.getElementById('subtopicMaterial');
+            
+            // Populate material dropdown
+            materialSelect.innerHTML = '';
+            appState.materials.forEach(material => {
+                const subject = appState.subjects.find(s => s.id === material.subjectId);
+                const option = document.createElement('option');
+                option.value = material.id;
+                option.textContent = `${material.name} (${subject ? subject.name : 'Unknown'})`;
+                materialSelect.appendChild(option);
+            });
+            
+            if (subtopicId) {
+                // Editing existing subtopic
+                const subtopic = appState.subtopics.find(st => st.id === subtopicId);
+                if (!subtopic) return;
+                
+                title.textContent = 'Edit Subtopic';
+                document.getElementById('subtopicTitle').value = subtopic.title;
+                materialSelect.value = subtopic.materialId;
+                document.getElementById('subtopicStatus').value = subtopic.status;
+                document.getElementById('subtopicNotes').value = subtopic.notes || '';
+                document.getElementById('subtopicFlagReview').checked = subtopic.flagReview;
+                appState.editingItem = { type: 'subtopic', id: subtopicId };
+            } else {
+                // Adding new subtopic
+                title.textContent = 'Add Subtopic';
+                form.reset();
+                
+                // Pre-select current material if one is selected
+                if (appState.selectedMaterial) {
+                    materialSelect.value = appState.selectedMaterial;
+                }
+                
+                appState.editingItem = { type: 'subtopic', id: null };
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        // Open today's plan modal
+        function openTodayPlanModal() {
+            const modal = document.getElementById('todayPlanModal');
+            modal.style.display = 'flex';
+            renderTodayPlan();
+        }
+
+        // Close all modals
+        function closeAllModals() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+            appState.editingItem = null;
+        }
+
+        // =============================================================================
+        // DATA MANIPULATION FUNCTIONS
+        // =============================================================================
+
+        // Save subject from form
+        function saveSubject(formData) {
+            const { subjectName } = formData;
+            
+            if (appState.editingItem && appState.editingItem.type === 'subject' && appState.editingItem.id) {
+                // Update existing subject
+                const subject = appState.subjects.find(s => s.id === appState.editingItem.id);
+                if (subject) {
+                    subject.name = subjectName;
+                    subject.updatedAt = new Date().toISOString();
+                }
+            } else {
+                // Add new subject
+                const newSubject = {
+                    id: 's' + Date.now(),
+                    name: subjectName,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    order: appState.subjects.length
+                };
+                appState.subjects.push(newSubject);
+            }
+            
+            saveData();
+            renderApp();
+            closeAllModals();
+        }
+
+        // Save material from form
+        function saveMaterial(formData) {
+            const { materialName, materialSubject } = formData;
+            
+            if (appState.editingItem && appState.editingItem.type === 'material' && appState.editingItem.id) {
+                // Update existing material
+                const material = appState.materials.find(m => m.id === appState.editingItem.id);
+                if (material) {
+                    material.name = materialName;
+                    material.subjectId = materialSubject;
+                    material.updatedAt = new Date().toISOString();
+                }
+            } else {
+                // Add new material
+                const newMaterial = {
+                    id: 'm' + Date.now(),
+                    subjectId: materialSubject,
+                    name: materialName,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    order: appState.materials.filter(m => m.subjectId === materialSubject).length
+                };
+                appState.materials.push(newMaterial);
+            }
+            
+            saveData();
+            renderApp();
+            closeAllModals();
+        }
+
+        // Save subtopic from form
+        function saveSubtopic(formData) {
+            const { subtopicTitle, subtopicMaterial, subtopicStatus, subtopicNotes, subtopicFlagReview } = formData;
+            
+            if (appState.editingItem && appState.editingItem.type === 'subtopic' && appState.editingItem.id) {
+                // Update existing subtopic
+                const subtopic = appState.subtopics.find(st => st.id === appState.editingItem.id);
+                if (subtopic) {
+                    subtopic.title = subtopicTitle;
+                    subtopic.materialId = subtopicMaterial;
+                    subtopic.status = subtopicStatus;
+                    subtopic.notes = subtopicNotes;
+                    subtopic.flagReview = subtopicFlagReview;
+                    subtopic.updatedAt = new Date().toISOString();
+                }
+            } else {
+                // Add new subtopic
+                const newSubtopic = {
+                    id: 'st' + Date.now(),
+                    materialId: subtopicMaterial,
+                    title: subtopicTitle,
+                    status: subtopicStatus,
+                    notes: subtopicNotes,
+                    flagReview: subtopicFlagReview,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                    order: appState.subtopics.filter(st => st.materialId === subtopicMaterial).length
+                };
+                appState.subtopics.push(newSubtopic);
+            }
+            
+            saveData();
+            renderApp();
+            closeAllModals();
+        }
+
+        // Delete subject
+        function deleteSubject(subjectId) {
+            if (confirm('Are you sure you want to delete this subject? All associated materials and subtopics will also be deleted.')) {
+                // Delete associated materials and subtopics
+                const materialIds = appState.materials
+                    .filter(m => m.subjectId === subjectId)
+                    .map(m => m.id);
+                
+                appState.materials = appState.materials.filter(m => m.subjectId !== subjectId);
+                appState.subtopics = appState.subtopics.filter(st => !materialIds.includes(st.materialId));
+                
+                // Delete subject
+                appState.subjects = appState.subjects.filter(s => s.id !== subjectId);
+                
+                // Update selected subject if it was deleted
+                if (appState.selectedSubject === subjectId) {
+                    appState.selectedSubject = null;
+                }
+                
+                saveData();
+                renderApp();
+            }
+        }
+
+        // Delete material
+        function deleteMaterial(materialId) {
+            if (confirm('Are you sure you want to delete this material? All associated subtopics will also be deleted.')) {
+                // Delete associated subtopics
+                appState.subtopics = appState.subtopics.filter(st => st.materialId !== materialId);
+                
+                // Delete material
+                appState.materials = appState.materials.filter(m => m.id !== materialId);
+                
+                // Update selected material if it was deleted
+                if (appState.selectedMaterial === materialId) {
+                    appState.selectedMaterial = null;
+                }
+                
+                saveData();
+                renderApp();
+            }
+        }
+
+        // Delete subtopic
+        function deleteSubtopic(subtopicId) {
+            if (confirm('Are you sure you want to delete this subtopic?')) {
+                appState.subtopics = appState.subtopics.filter(st => st.id !== subtopicId);
+                
+                // Remove from today's plan if it's there
+                appState.todayPlan = appState.todayPlan.filter(item => item.subtopicId !== subtopicId);
+                
+                saveData();
+                renderApp();
+            }
+        }
+
+        // Toggle subtopic status
+        function toggleSubtopicStatus(subtopicId) {
+            const subtopic = appState.subtopics.find(st => st.id === subtopicId);
+            if (!subtopic) return;
+            
+            if (subtopic.status === 'completed') {
+                subtopic.status = 'not_started';
+            } else {
+                subtopic.status = 'completed';
+            }
+            
+            subtopic.updatedAt = new Date().toISOString();
+            saveData();
+            renderApp();
+        }
+
+        // Toggle flag review
+        function toggleFlagReview(subtopicId) {
+            const subtopic = appState.subtopics.find(st => st.id === subtopicId);
+            if (!subtopic) return;
+            
+            subtopic.flagReview = !subtopic.flagReview;
+            subtopic.updatedAt = new Date().toISOString();
+            saveData();
+            renderApp();
+        }
+
+        // Add subtopic to today's plan
+        function addToTodayPlan(subtopicId) {
+            // Check if already in plan
+            if (appState.todayPlan.some(item => item.subtopicId === subtopicId)) {
+                alert('This subtopic is already in today\'s plan.');
+                return;
+            }
+            
+            appState.todayPlan.push({
+                subtopicId,
+                addedAt: new Date().toISOString()
+            });
+            
+            saveData();
+            alert('Subtopic added to today\'s plan!');
+        }
+
+        // Remove from today's plan
+        function removeFromTodayPlan(index) {
+            appState.todayPlan.splice(index, 1);
+            saveData();
+            renderTodayPlan();
+        }
+
+        // Auto-populate today's plan with incomplete items
+        function autoPopulateIncomplete(count) {
+            const incompleteSubtopics = appState.subtopics
+                .filter(st => st.status !== 'completed')
+                .slice(0, count);
+            
+            incompleteSubtopics.forEach(subtopic => {
+                if (!appState.todayPlan.some(item => item.subtopicId === subtopic.id)) {
+                    appState.todayPlan.push({
+                        subtopicId: subtopic.id,
+                        addedAt: new Date().toISOString()
+                    });
+                }
+            });
+            
+            saveData();
+            renderTodayPlan();
+            alert(`Added ${incompleteSubtopics.length} incomplete items to today's plan.`);
+        }
+
+        // Auto-populate today's plan with review items
+        function autoPopulateReview(count) {
+            const reviewSubtopics = appState.subtopics
+                .filter(st => st.flagReview)
+                .slice(0, count);
+            
+            reviewSubtopics.forEach(subtopic => {
+                if (!appState.todayPlan.some(item => item.subtopicId === subtopic.id)) {
+                    appState.todayPlan.push({
+                        subtopicId: subtopic.id,
+                        addedAt: new Date().toISOString()
+                    });
+                }
+            });
+            
+            saveData();
+            renderTodayPlan();
+            alert(`Added ${reviewSubtopics.length} review items to today's plan.`);
+        }
+
+        // =============================================================================
+        // UTILITY FUNCTIONS
+        // =============================================================================
+
+        // Calculate material progress percentage
+        function calculateMaterialProgress(materialId) {
+            const materialSubtopics = appState.subtopics.filter(st => st.materialId === materialId);
+            if (materialSubtopics.length === 0) return 0;
+            
+            const completedCount = materialSubtopics.filter(st => st.status === 'completed').length;
+            return Math.round((completedCount / materialSubtopics.length) * 100);
+        }
+
+        // Format status for display
+        function formatStatus(status) {
+            switch (status) {
+                case 'not_started': return 'Not Started';
+                case 'in_progress': return 'In Progress';
+                case 'completed': return 'Completed';
+                default: return status;
+            }
+        }
+
+        // =============================================================================
+        // EVENT LISTENER SETUP
+        // =============================================================================
+
+        // Set up all event listeners
+        function setupEventListeners() {
+            // Navigation
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    appState.currentView = link.getAttribute('data-view');
+                    renderApp();
+                });
+            });
+            
+            // Sidebar toggle
+            document.getElementById('sidebarToggle').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('expanded');
+            });
+            
+            // Add buttons
+            document.getElementById('addMaterialBtn').addEventListener('click', () => openMaterialModal());
+            document.getElementById('addSubtopicBtn').addEventListener('click', () => openSubtopicModal());
+            document.getElementById('addToPlanBtn').addEventListener('click', () => openTodayPlanModal());
+            
+            // Modal close buttons
+            document.getElementById('closeSubjectModal').addEventListener('click', closeAllModals);
+            document.getElementById('closeMaterialModal').addEventListener('click', closeAllModals);
+            document.getElementById('closeSubtopicModal').addEventListener('click', closeAllModals);
+            document.getElementById('closeTodayPlanModal').addEventListener('click', closeAllModals);
+            document.getElementById('closeReminderModal').addEventListener('click', closeAllModals);
+            document.getElementById('closeConfirmationModal').addEventListener('click', closeAllModals);
+            
+            // Modal cancel buttons
+            document.getElementById('cancelSubjectBtn').addEventListener('click', closeAllModals);
+            document.getElementById('cancelMaterialBtn').addEventListener('click', closeAllModals);
+            document.getElementById('cancelSubtopicBtn').addEventListener('click', closeAllModals);
+            document.getElementById('cancelReminderBtn').addEventListener('click', closeAllModals);
+            document.getElementById('cancelConfirmationBtn').addEventListener('click', closeAllModals);
+            
+            // Form submissions
+            document.getElementById('subjectForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = {
+                    subjectName: document.getElementById('subjectName').value
+                };
+                saveSubject(formData);
+            });
+            
+            document.getElementById('materialForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = {
+                    materialName: document.getElementById('materialName').value,
+                    materialSubject: document.getElementById('materialSubject').value
+                };
+                saveMaterial(formData);
+            });
+            
+            document.getElementById('subtopicForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const formData = {
+                    subtopicTitle: document.getElementById('subtopicTitle').value,
+                    subtopicMaterial: document.getElementById('subtopicMaterial').value,
+                    subtopicStatus: document.getElementById('subtopicStatus').value,
+                    subtopicNotes: document.getElementById('subtopicNotes').value,
+                    subtopicFlagReview: document.getElementById('subtopicFlagReview').checked
+                };
+                saveSubtopic(formData);
+            });
+            
+            // Today's plan actions
+            document.getElementById('autoPopulateIncompleteBtn').addEventListener('click', () => {
+                const count = parseInt(document.getElementById('autoPopulateCount').value) || 5;
+                autoPopulateIncomplete(count);
+            });
+            
+            document.getElementById('autoPopulateReviewBtn').addEventListener('click', () => {
+                const count = parseInt(document.getElementById('autoPopulateCount').value) || 5;
+                autoPopulateReview(count);
+            });
+            
+            document.getElementById('closeTodayPlanBtn').addEventListener('click', () => {
+                closeAllModals();
+            });
+            
+            // Export/Import
+            document.getElementById('exportBtn').addEventListener('click', exportData);
+            document.getElementById('importBtn').addEventListener('click', () => {
+                document.getElementById('importFile').click();
+            });
+            
+            document.getElementById('importFile').addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    if (confirm('Importing data will replace your current data. Continue?')) {
+                        importData(e.target.files[0], false);
+                    }
+                    e.target.value = ''; // Reset file input
+                }
+            });
+            
+            // Pomodoro controls
+            document.getElementById('startPomodoro').addEventListener('click', startPomodoro);
+            document.getElementById('pausePomodoro').addEventListener('click', pausePomodoro);
+            document.getElementById('resetPomodoro').addEventListener('click', resetPomodoro);
+            
+            document.querySelectorAll('.pomodoro-mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const mode = btn.getAttribute('data-mode');
+                    switchPomodoroMode(mode);
+                });
+            });
+            
+            // Time tracking controls
+            document.getElementById('startTimeTracking').addEventListener('click', startTimeTracking);
+            document.getElementById('pauseTimeTracking').addEventListener('click', pauseTimeTracking);
+            document.getElementById('resetTimeTracking').addEventListener('click', resetTimeTracking);
+            
+            // Notification permission
+            document.getElementById('allowNotificationsBtn').addEventListener('click', requestNotificationPermission);
+            document.getElementById('denyNotificationsBtn').addEventListener('click', () => {
+                document.getElementById('notificationPermissionModal').style.display = 'none';
+            });
+            
+            // Initialize drag and drop after a short delay to ensure DOM is ready
+            setTimeout(initDragAndDrop, 100);
+        }
+
+        // =============================================================================
+        // INITIALIZATION
+        // =============================================================================
+
+        // Start the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
